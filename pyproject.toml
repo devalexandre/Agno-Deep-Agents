@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agno-deep-agent"
+version = "0.1.0"
+description = "Opinionated Deep Agent harness built with Agno primitives."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+  { name = "Agno Deep Agent contributors" }
+]
+dependencies = [
+  "agno>=2.5.17",
+  "openai",
+  "ollama",
+]
+
+[project.urls]
+Documentation = "https://devalexandre.github.io/Agno-Deep-Agents/"
+Repository = "https://github.com/devalexandre/Agno-Deep-Agents"
+
+[project.scripts]
+agno-deep-agent = "agno_deep_agents.cli:main"
+agdeep = "agno_deep_agents.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["agno_deep_agents*"]

@@ -1,0 +1,10 @@
+title: Agno Deep Agent
+description: An opinionated Deep Agent harness built with Agno primitives.
+baseurl: "/Agno-Deep-Agents"
+markdown: kramdown
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
