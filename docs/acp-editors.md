@@ -124,6 +124,64 @@ Validation checklist:
 - If your editor expects additional ACP methods, verify compatibility with the
   currently implemented method set above.
 
+### ACP Client Not Connecting (Quick Diagnostic)
+
+If your ACP client failed to connect during testing, use this quick checklist
+in order:
+
+1. **Verify the exact command outside the editor**
+
+   Run the same server command in a terminal first:
+
+   ```bash
+   agdeep acp --model ollama:gemma4:e4b --workspace /absolute/path/to/project --debug
+   ```
+
+   If this fails, fix the CLI/model/workspace issue before trying the editor
+   again.
+
+2. **Confirm the editor can find `agdeep`**
+
+   Many editor/plugin processes run with a different PATH than your shell.
+   Prefer an absolute binary path in ACP client config when possible.
+
+3. **Use stdio transport only**
+
+   Agno Deep Agent ACP currently runs as a stdio server. Do not configure HTTP,
+   WebSocket, or custom transport adapters unless your ACP client explicitly
+   wraps stdio correctly.
+
+4. **Ensure `--workspace` is valid and absolute**
+
+   Relative paths or missing directories commonly break startup before ACP
+   `initialize` is exchanged.
+
+5. **Avoid wrappers that write to stdout**
+
+   ACP protocol frames are exchanged via stdout/stdin. Any extra stdout output
+   from shell wrappers, startup scripts, or plugin hooks can corrupt the
+   handshake and look like a connection failure.
+
+6. **Check expected handshake sequence**
+
+   A healthy connection should call:
+
+   - `initialize`
+   - `session/new` (or `session/load`)
+   - `session/prompt`
+
+   If your client requires methods outside this set, the integration may not be
+   compatible yet.
+
+7. **Retest with a minimal prompt**
+
+   After connection succeeds, test with a short prompt and confirm streamed
+   updates plus cancellation behavior (`session/cancel`).
+
+These steps usually isolate whether the issue is: command startup, PATH,
+workspace/config, transport mismatch, stdout contamination, or ACP method
+compatibility.
+
 ## What Is Not Claimed Yet
 
 - No claim of complete ACP feature parity across all editor clients.

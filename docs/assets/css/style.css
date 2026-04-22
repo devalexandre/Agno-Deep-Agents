@@ -13,23 +13,24 @@ html[data-theme="light"] {
   --agno-border: #e4e4e7;
   --agno-inline-code-bg: #f4f4f5;
   --agno-inline-code-text: #27272a;
-  --agno-code-bg: #111113;
-  --agno-code-text: #f4f4f5;
-  --agno-code-border: #27272a;
+  --agno-code-bg: #ffffff;
+  --agno-code-text: #1f2328;
+  --agno-code-border: #d0d7de;
+  --agno-code-font: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --agno-table-head: #fafafa;
   --agno-shadow: 0 24px 70px rgba(17, 17, 19, 0.08);
   --agno-header-bg: rgba(255, 255, 255, 0.86);
   --agno-radial: rgba(255, 64, 23, 0.11);
   --agno-link: #c92d11;
   --agno-link-hover: #ff4017;
-  --agno-token-comment: #9ca3af;
-  --agno-token-keyword: #ff7a45;
-  --agno-token-string: #7dd3fc;
-  --agno-token-number: #fbbf24;
-  --agno-token-name: #f8fafc;
-  --agno-token-function: #a7f3d0;
-  --agno-token-class: #fda4af;
-  --agno-token-operator: #f4f4f5;
+  --agno-token-comment: #6e7781;
+  --agno-token-keyword: #cf222e;
+  --agno-token-string: #0a3069;
+  --agno-token-number: #0550ae;
+  --agno-token-name: #1f2328;
+  --agno-token-function: #953800;
+  --agno-token-class: #8250df;
+  --agno-token-operator: #1f2328;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -45,9 +46,9 @@ html[data-theme="light"] {
     --agno-border: #27272a;
     --agno-inline-code-bg: #27272a;
     --agno-inline-code-text: #fafafa;
-    --agno-code-bg: #09090b;
-    --agno-code-text: #f4f4f5;
-    --agno-code-border: #3f3f46;
+    --agno-code-bg: #0b0c0e;
+    --agno-code-text: #d4d4d4;
+    --agno-code-border: #30363d;
     --agno-table-head: #202023;
     --agno-shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
     --agno-header-bg: rgba(17, 17, 19, 0.86);
@@ -70,15 +71,23 @@ html.dark {
   --agno-border: #27272a;
   --agno-inline-code-bg: #27272a;
   --agno-inline-code-text: #fafafa;
-  --agno-code-bg: #09090b;
-  --agno-code-text: #f4f4f5;
-  --agno-code-border: #3f3f46;
+  --agno-code-bg: #0b0c0e;
+  --agno-code-text: #d4d4d4;
+  --agno-code-border: #30363d;
   --agno-table-head: #202023;
   --agno-shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
   --agno-header-bg: rgba(17, 17, 19, 0.86);
   --agno-radial: rgba(255, 64, 23, 0.16);
   --agno-link: #ff7a45;
   --agno-link-hover: #ff4017;
+  --agno-token-comment: #6a9955;
+  --agno-token-keyword: #569cd6;
+  --agno-token-string: #ce9178;
+  --agno-token-number: #b5cea8;
+  --agno-token-name: #9cdcfe;
+  --agno-token-function: #dcdcaa;
+  --agno-token-class: #4ec9b0;
+  --agno-token-operator: #d4d4d4;
 }
 
 * {
@@ -284,7 +293,15 @@ code {
   border-radius: 0.35rem;
   background: var(--agno-inline-code-bg);
   color: var(--agno-inline-code-text);
+  font-family: var(--agno-code-font);
   font-size: 0.92em;
+}
+
+code,
+kbd,
+pre,
+samp {
+  font-family: var(--agno-code-font);
 }
 
 pre,

@@ -401,10 +401,14 @@ class ACPServer:
         cwd = params.get("cwd") or str(self.config.resolved_workspace)
         if not isinstance(cwd, str) or not cwd:
             raise JsonRpcError(-32602, "Invalid params", "cwd must be a non-empty string.")
-        resolved = Path(cwd).expanduser()
-        if not resolved.is_absolute():
-            raise JsonRpcError(-32602, "Invalid params", "cwd must be an absolute path.")
-        return resolved.resolve()
+        candidate = Path(cwd).expanduser()
+        if candidate.is_absolute():
+            return candidate.resolve()
+
+        # Some ACP clients send relative cwd values such as "." during
+        # handshake/session creation. Resolve those relative paths against the
+        # server workspace to improve compatibility across editor plugins.
+        return (self.config.resolved_workspace / candidate).resolve()
 
     def _get_session(self, session_id: Any) -> ACPSession:
         if not isinstance(session_id, str) or not session_id:
