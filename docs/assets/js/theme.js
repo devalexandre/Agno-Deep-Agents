@@ -5,6 +5,7 @@
 
   function applyTheme(theme) {
     root.dataset.theme = theme;
+    root.classList.toggle("dark", theme === "dark");
     if (!toggle) {
       return;
     }

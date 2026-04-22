@@ -32,10 +32,13 @@ uses Agno primitives instead of introducing a separate runtime.
 
 - [Get Started](getting-started.html)
 - [CLI](cli.html)
+- [ACP Editors](acp-editors.html)
 - [Python API](python-api.html)
 - [Models and Ollama](models.html)
 - [Architecture](architecture.html)
+- [Protocols](protocols.html)
 - [Skills](skills.html)
+- [Roadmap](roadmap.html)
 - [Publish on GitHub Pages](github-pages.html)
 - [Troubleshooting](troubleshooting.html)
 
@@ -48,6 +51,7 @@ uses Agno primitives instead of introducing a separate runtime.
 - Workspace-restricted `CodingTools`.
 - Support for OpenAI, local Ollama, and Ollama Cloud through model strings.
 - Agno-inspired documentation styling with dark mode and syntax highlighting.
+- ACP stdio server plus protocol direction for MCP and AgentOS.
 
 ## Custom Tool Example
 

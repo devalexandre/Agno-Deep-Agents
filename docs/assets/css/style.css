@@ -1,4 +1,5 @@
-:root {
+:root,
+html[data-theme="light"] {
   --agno-primary: #ff4017;
   --agno-primary-dark: #c92d11;
   --agno-bg: #ffffff;
@@ -31,7 +32,33 @@
   --agno-token-operator: #f4f4f5;
 }
 
-html[data-theme="dark"] {
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme]) {
+    color-scheme: dark;
+    --agno-bg: #111113;
+    --agno-bg-soft: #18181b;
+    --agno-surface: rgba(24, 24, 27, 0.76);
+    --agno-surface-solid: #18181b;
+    --agno-text: #fafafa;
+    --agno-text-soft: #d4d4d8;
+    --agno-muted: #a1a1aa;
+    --agno-border: #27272a;
+    --agno-inline-code-bg: #27272a;
+    --agno-inline-code-text: #fafafa;
+    --agno-code-bg: #09090b;
+    --agno-code-text: #f4f4f5;
+    --agno-code-border: #3f3f46;
+    --agno-table-head: #202023;
+    --agno-shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
+    --agno-header-bg: rgba(17, 17, 19, 0.86);
+    --agno-radial: rgba(255, 64, 23, 0.16);
+    --agno-link: #ff7a45;
+    --agno-link-hover: #ff4017;
+  }
+}
+
+html[data-theme="dark"],
+html.dark {
   color-scheme: dark;
   --agno-bg: #111113;
   --agno-bg-soft: #18181b;
@@ -141,7 +168,8 @@ a:hover {
   color: white;
 }
 
-html[data-theme="dark"] .site-nav .nav-button {
+html[data-theme="dark"] .site-nav .nav-button,
+html.dark .site-nav .nav-button {
   background: #ffffff;
   color: #111113;
 }

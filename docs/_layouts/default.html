@@ -14,13 +14,15 @@
           savedTheme = null;
         }
         var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-        document.documentElement.dataset.theme = savedTheme || (prefersDark ? "dark" : "light");
+        var theme = savedTheme || (prefersDark ? "dark" : "light");
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.classList.toggle("dark", theme === "dark");
       })();
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;750;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}?v={{ site.time | date: '%s' }}">
   </head>
   <body>
     <header class="site-header">
@@ -46,7 +48,9 @@
         <a href="{{ '/python-api.html' | relative_url }}">Python API</a>
         <a href="{{ '/models.html' | relative_url }}">Models and Ollama</a>
         <a href="{{ '/architecture.html' | relative_url }}">Architecture</a>
+        <a href="{{ '/protocols.html' | relative_url }}">Protocols</a>
         <a href="{{ '/skills.html' | relative_url }}">Skills</a>
+        <a href="{{ '/roadmap.html' | relative_url }}">Roadmap</a>
         <a href="{{ '/github-pages.html' | relative_url }}">GitHub Pages</a>
         <a href="{{ '/troubleshooting.html' | relative_url }}">Troubleshooting</a>
       </aside>
@@ -54,6 +58,6 @@
         {{ content }}
       </main>
     </div>
-    <script src="{{ '/assets/js/theme.js' | relative_url }}"></script>
+    <script src="{{ '/assets/js/theme.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
   </body>
 </html>

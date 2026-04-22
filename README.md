@@ -11,6 +11,9 @@ learning.
 The GitHub Pages documentation lives in [`docs/`](docs/index.md). To publish it,
 configure GitHub Pages with branch `main` and folder `/docs`.
 
+Project planning lives in [ROADMAP.md](ROADMAP.md). Protocol direction for ACP,
+MCP, and AgentOS is documented in [`docs/protocols.md`](docs/protocols.md).
+
 ## What Is Included
 
 - **`TeamMode.tasks`** to decompose, execute, and review work in a task loop.
@@ -22,6 +25,8 @@ configure GitHub Pages with branch `main` and folder `/docs`.
 - **Local skills** in `skills/`, loaded through Agno progressive discovery.
 - **Workspace-restricted `CodingTools`**.
 - **Installable CLI** with `agno-deep-agent` and the short alias `agdeep`.
+- **ACP stdio server** for editor and IDE integration.
+- **Protocol roadmap** for MCP tool loading and AgentOS.
 
 > Note: shell execution is restricted by workspace, command allowlist, timeout,
 > and `CodingTools` operator checks. This is useful in practice, but it is not an
@@ -131,6 +136,17 @@ agno-deep-agent --user-id dev@example.com --session-id agno-deep-agent-local \
   "Continue the previous task and validate what remains"
 ```
 
+Run as an ACP server for compatible editors and IDEs:
+
+```bash
+agdeep acp --model ollama:gemma4:e4b --workspace /absolute/path/to/project
+```
+
+The ACP server speaks newline-delimited JSON-RPC over stdio. It supports
+`initialize`, `session/new`, `session/load`, `session/prompt`, and
+`session/cancel`, while reusing the same Agno `Team`, skills, memory, and
+workspace tooling as the normal CLI.
+
 ## Python API
 
 ```python
@@ -182,6 +198,9 @@ agent.print_response("what is the weather in sf?", stream=True)
 - **Model providers**: simple Agno-style model strings such as
   `openai-responses:gpt-5.2`, `openai:gpt-5.2`, `ollama:llama3.1:8b`, and
   `ollama-responses:gpt-oss:20b`. Use `ollama-cloud:<model>` for Ollama Cloud.
+- **Protocols**: ACP is available as a stdio server for editor/IDE integration,
+  MCP is planned for external tool loading, and AgentOS is planned as an
+  Agno-native API example.
 
 ## Project Structure
 
@@ -194,6 +213,8 @@ agent.print_response("what is the weather in sf?", stream=True)
 +-- docs/
 |   +-- index.md
 |   +-- ...
+|   +-- protocols.md
+|   +-- roadmap.md
 +-- examples/
 |   +-- ollama_deep_agent.py
 +-- skills/
@@ -204,5 +225,6 @@ agent.print_response("what is the weather in sf?", stream=True)
 +-- main.py
 +-- pyproject.toml
 +-- README.md
++-- ROADMAP.md
 +-- requirements.txt
 ```

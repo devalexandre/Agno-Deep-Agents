@@ -84,6 +84,22 @@ agno-deep-agent --model ollama:gemma4:e4b \
 The `ollama:` provider uses `http://localhost:11434` by default. This prevents
 an `OLLAMA_API_KEY` variable from accidentally sending local runs to cloud.
 
+## ACP For Editors
+
+Run the same agent harness as an ACP stdio server:
+
+```bash
+agdeep acp --model ollama:gemma4:e4b --workspace /absolute/path/to/project
+```
+
+Use this command in ACP-compatible editors or local ACP clients. The editor
+creates sessions and sends prompts over JSON-RPC; Agno Deep Agent responds with
+plan, message, session metadata, and tool updates.
+
+For editor-specific setup guidance (Zed, VS Code-compatible extensions,
+JetBrains plugins, and Neovim clients), read
+[ACP Editors](acp-editors.html).
+
 ## First Python Example
 
 ```bash

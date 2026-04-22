@@ -58,6 +58,31 @@ printf "Review the documentation and find gaps" | agno-deep-agent
 | `--hide-members` | Hide specialist member responses. |
 | `--debug` | Enable Agno debug mode. |
 
+## ACP Server
+
+Run Agno Deep Agent as an ACP stdio server:
+
+```bash
+agdeep acp --model ollama:gemma4:e4b --workspace /absolute/path/to/project
+```
+
+ACP clients launch this command as a subprocess and communicate through
+newline-delimited JSON-RPC. The server writes protocol messages to stdout and
+uses stderr for logs.
+
+Supported ACP methods:
+
+| Method | Status |
+| --- | --- |
+| `initialize` | Supported |
+| `session/new` | Supported |
+| `session/load` | Supported |
+| `session/prompt` | Supported |
+| `session/cancel` | Supported |
+
+For per-editor ACP setup notes (Zed, VS Code-compatible extensions, JetBrains,
+and Neovim), see [ACP Editors](acp-editors.html).
+
 ## Examples
 
 Run with local Ollama:
