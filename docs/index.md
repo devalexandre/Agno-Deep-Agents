@@ -47,6 +47,7 @@ uses Agno primitives instead of introducing a separate runtime.
 - Local skills in `skills/`.
 - Workspace-restricted `CodingTools`.
 - Support for OpenAI, local Ollama, and Ollama Cloud through model strings.
+- Agno-inspired documentation styling with dark mode and syntax highlighting.
 
 ## Custom Tool Example
 

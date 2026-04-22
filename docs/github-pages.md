@@ -36,6 +36,9 @@ dark background: #111113
 font: Inter
 ```
 
+The site also includes a persisted dark mode toggle and Rouge-compatible syntax
+highlighting for fenced code blocks.
+
 ## Optional Local Preview
 
 If you want to test with Jekyll locally, install Ruby/Jekyll and run from the
