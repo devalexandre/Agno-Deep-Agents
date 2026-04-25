@@ -13,8 +13,10 @@ authors = [
 ]
 dependencies = [
   "agno>=2.5.17",
+  "sqlalchemy",
   "openai",
   "ollama",
+  "typer",
 ]
 
 [project.urls]
