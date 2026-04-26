@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import shutil
 import subprocess
 import sys
 from dataclasses import replace
@@ -13,14 +14,47 @@ from agno_deep_agents.acp_server import run_acp_server
 
 
 AGNO_COLORS = {
-    "primary": "\033[38;2;0;202;190m",
-    "accent": "\033[38;2;95;220;140m",
-    "muted": "\033[38;2;130;148;170m",
+    "brand": "\033[1m\033[38;2;255;64;23m",
+    "primary": "\033[38;2;255;64;23m",
+    "primary_dark": "\033[38;2;201;45;17m",
+    "accent": "\033[38;2;255;122;69m",
+    "shadow": "\033[38;2;89;30;19m",
+    "surface": "\033[38;2;24;24;27m",
+    "text": "\033[38;2;250;250;250m",
+    "soft": "\033[38;2;212;212;216m",
+    "muted": "\033[38;2;161;161;170m",
     "warning": "\033[38;2;245;170;70m",
     "error": "\033[38;2;245;95;95m",
     "reset": "\033[0m",
     "bold": "\033[1m",
 }
+
+AGNO_LOGO = (
+    "  ███████████████  ",
+    "  ██           ██  ",
+    "  ██    ███    ██  ",
+    "  ██   █████   ██  ",
+    "  ██  ███ ███  ██  ",
+    "  ██  ███████  ██  ",
+    "  ██ ███   ███ ██  ",
+    "  ███████████████  ",
+)
+
+AGNO_WORDMARK = (
+    "     █████   ██████  ███    ██  ██████",
+    "    ██   ██ ██       ████   ██ ██    ██",
+    "    ███████ ██   ███ ██ ██  ██ ██    ██",
+    "    ██   ██ ██    ██ ██  ██ ██ ██    ██",
+    "    ██   ██  ██████  ██   ████  ██████",
+)
+
+DEEP_AGENTS_WORDMARK = (
+    " ██████  ███████ ███████ ██████      █████   ██████  ███████ ███    ██ ████████ ███████",
+    " ██   ██ ██      ██      ██   ██    ██   ██ ██       ██      ████   ██    ██    ██",
+    " ██   ██ █████   █████   ██████     ███████ ██   ███ █████   ██ ██  ██    ██    ███████",
+    " ██   ██ ██      ██      ██         ██   ██ ██    ██ ██      ██  ██ ██    ██         ██",
+    " ██████  ███████ ███████ ██         ██   ██  ██████  ███████ ██   ████    ██    ███████",
+)
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -410,7 +444,7 @@ def _run_interactive(
 
     while True:
         try:
-            prompt = input(_paint("agdeep", "primary", use_color) + _paint(" > ", "muted", use_color))
+            prompt = input(_prompt_prefix(use_color))
         except EOFError:
             print()
             return 0
@@ -558,33 +592,39 @@ def _print_banner(
     pending_media: DeepAgentMedia,
     use_color: bool,
 ) -> None:
-    title = _paint("Agno Deep Agent", "primary", use_color)
-    print(f"{title} {_paint('interactive CLI', 'muted', use_color)}")
+    if _should_print_large_banner():
+        _print_large_agno_banner(use_color)
+    else:
+        title = _paint("Agno Deep Agents", "brand", use_color)
+        print(f"{title} {_paint('interactive CLI', 'muted', use_color)}")
     print(
-        _paint(
-            f"model={config.model} session={session_id} compression={'on' if config.compress_tool_results else 'off'}",
-            "muted",
-            use_color,
+        " ".join(
+            (
+                _kv("model", str(config.model), use_color),
+                _kv("session", session_id, use_color),
+                _kv("compression", "on" if config.compress_tool_results else "off", use_color),
+            )
         )
     )
     if not pending_media.is_empty:
         print(_paint(_media_summary(pending_media), "accent", use_color))
-    print(_paint("Type /help for commands, /quit to exit.", "muted", use_color))
+    print(_paint("Ready to build. What would you like to build?", "accent", use_color))
+    print(_paint("Enter send • Ctrl+J newline • @ files • / commands", "muted", use_color))
 
 
 def _print_interactive_help(use_color: bool) -> None:
     print(_paint("Commands", "primary", use_color))
-    print("  /status                     show model, workspace, compression, and pending media")
-    print("  /model [provider:model]     show or switch model")
-    print("  /compress on|off|status     toggle Agno tool-result compression")
-    print("  /attach image <path|url>    attach image to the next prompt")
-    print("  /attach audio <path|url>    attach audio to the next prompt")
-    print("  /attach video <path|url>    attach video to the next prompt")
-    print("  /attach file <path|url>     attach a document/file to the next prompt")
-    print("  /media                      show pending attachments")
-    print("  /clear                      start a fresh session id")
-    print("  !<command>                  ask the agent to run an allowed shell command")
-    print("  /quit                       exit")
+    print(_command_help("/status", "show model, workspace, compression, and pending media", use_color))
+    print(_command_help("/model [provider:model]", "show or switch model", use_color))
+    print(_command_help("/compress on|off|status", "toggle Agno tool-result compression", use_color))
+    print(_command_help("/attach image <path|url>", "attach image to the next prompt", use_color))
+    print(_command_help("/attach audio <path|url>", "attach audio to the next prompt", use_color))
+    print(_command_help("/attach video <path|url>", "attach video to the next prompt", use_color))
+    print(_command_help("/attach file <path|url>", "attach a document/file to the next prompt", use_color))
+    print(_command_help("/media", "show pending attachments", use_color))
+    print(_command_help("/clear", "start a fresh session id", use_color))
+    print(_command_help("!<command>", "ask the agent to run an allowed shell command", use_color))
+    print(_command_help("/quit", "exit", use_color))
 
 
 def _print_status(
@@ -597,17 +637,22 @@ def _print_status(
     if config.enable_shell:
         shell_policy = "all" if config.allow_all_shell_commands else ",".join(config.allowed_shell_commands)
     lines = [
-        f"Model: {config.model}",
-        f"Workspace: {config.resolved_workspace}",
-        f"Session: {session_id}",
-        f"Skills: {config.resolved_skills_dir}",
-        f"DB: {config.resolved_db_file}",
-        f"Compression: {'on' if config.compress_tool_results else 'off'}",
-        f"Media: {'send' if config.send_media_to_model else 'metadata-only'}, {'store' if config.store_media else 'do-not-store'}",
-        f"Shell: {shell_policy}",
-        _media_summary(pending_media),
+        _status_line("Model", str(config.model), use_color),
+        _status_line("Workspace", str(config.resolved_workspace), use_color),
+        _status_line("Session", session_id, use_color),
+        _status_line("Skills", str(config.resolved_skills_dir), use_color),
+        _status_line("DB", str(config.resolved_db_file), use_color),
+        _status_line("Compression", "on" if config.compress_tool_results else "off", use_color),
+        _status_line(
+            "Media",
+            f"{'send' if config.send_media_to_model else 'metadata-only'}, "
+            f"{'store' if config.store_media else 'do-not-store'}",
+            use_color,
+        ),
+        _status_line("Shell", shell_policy, use_color),
+        _paint(_media_summary(pending_media), "accent", use_color),
     ]
-    print(_paint("\n".join(lines), "accent", use_color))
+    print("\n".join(lines))
 
 
 def _media_summary(media: DeepAgentMedia) -> str:
@@ -622,6 +667,44 @@ def _media_summary(media: DeepAgentMedia) -> str:
 
 def _use_color(args: argparse.Namespace) -> bool:
     return not getattr(args, "no_color", False) and sys.stdout.isatty() and os.getenv("NO_COLOR") is None
+
+
+def _should_print_large_banner() -> bool:
+    return shutil.get_terminal_size((100, 24)).columns >= 92
+
+
+def _print_large_agno_banner(use_color: bool) -> None:
+    for line in _compose_logo_wordmark(AGNO_WORDMARK, use_color):
+        print(line)
+    for line in DEEP_AGENTS_WORDMARK:
+        print(_paint(line, "primary", use_color))
+    print(_paint(" " * 76 + "v0.1.0", "accent", use_color))
+
+
+def _compose_logo_wordmark(wordmark: tuple[str, ...], use_color: bool) -> list[str]:
+    lines: list[str] = []
+    for index, logo_line in enumerate(AGNO_LOGO):
+        logo = _paint(logo_line, "brand", use_color)
+        shadow = _paint("█", "shadow", use_color)
+        word = _paint(wordmark[index] if index < len(wordmark) else "", "primary", use_color)
+        lines.append(f"{shadow}{logo}  {word}")
+    return lines
+
+
+def _prompt_prefix(enabled: bool) -> str:
+    return _paint("▌", "primary", enabled) + _paint(" > ", "muted", enabled)
+
+
+def _kv(label: str, value: str, enabled: bool) -> str:
+    return _paint(label, "primary_dark", enabled) + _paint("=", "muted", enabled) + _paint(value, "soft", enabled)
+
+
+def _status_line(label: str, value: str, enabled: bool) -> str:
+    return _paint(f"{label}: ", "primary", enabled) + _paint(value, "soft", enabled)
+
+
+def _command_help(command: str, description: str, enabled: bool) -> str:
+    return "  " + _paint(command.ljust(28), "accent", enabled) + _paint(description, "soft", enabled)
 
 
 def _paint(text: str, style: str, enabled: bool) -> str:

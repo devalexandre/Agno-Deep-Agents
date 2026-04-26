@@ -92,6 +92,16 @@ Run without a prompt to open the Agno-colored interactive CLI:
 agno-deep-agent --model ollama:gemma4:e4b
 ```
 
+The session starts with the `Agno Deep Agents` ASCII banner, an Agno logo mark,
+and the prompt:
+
+```text
+▌ >
+```
+
+The CLI uses Agno's orange palette (`#FF4017`, `#C92D11`, `#FF7A45`) on a dark
+terminal background. Pass `--no-color` if your terminal or logs need plain text.
+
 Useful commands inside the session:
 
 ```text

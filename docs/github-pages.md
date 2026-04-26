@@ -31,10 +31,15 @@ The visual layer is custom CSS using the same core Agno documentation tokens:
 
 ```text
 primary: #FF4017
+primary dark: #C92D11
+accent: #FF7A45
 light background: #FFFFFF
 dark background: #111113
 font: Inter
 ```
+
+The terminal CLI mirrors these tokens for its interactive banner, ASCII Agno
+logo mark, `Agno Deep Agents` wordmark, command hints, and prompt bar.
 
 The site also includes a persisted dark mode toggle and Rouge-compatible syntax
 highlighting for fenced code blocks.

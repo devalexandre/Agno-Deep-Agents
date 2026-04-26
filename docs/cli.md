@@ -37,6 +37,29 @@ Launch an interactive session:
 agno-deep-agent
 ```
 
+In a wide terminal, the interactive session opens with an Agno-styled banner:
+
+```text
+█  ███████████████         █████   ██████  ███    ██  ██████
+█  ██           ██        ██   ██ ██       ████   ██ ██    ██
+█  ██    ███    ██        ███████ ██   ███ ██ ██  ██ ██    ██
+█  ██   █████   ██        ██   ██ ██    ██ ██  ██ ██ ██    ██
+█  ██  ███ ███  ██        ██   ██  ██████  ██   ████  ██████
+█  ██  ███████  ██
+█  ██ ███   ███ ██
+█  ███████████████
+ ██████  ███████ ███████ ██████      █████   ██████  ███████ ███    ██ ████████ ███████
+ ██   ██ ██      ██      ██   ██    ██   ██ ██       ██      ████   ██    ██    ██
+ ██   ██ █████   █████   ██████     ███████ ██   ███ █████   ██ ██  ██    ██    ███████
+ ██   ██ ██      ██      ██         ██   ██ ██    ██ ██      ██  ██ ██    ██         ██
+ ██████  ███████ ███████ ██         ██   ██  ██████  ███████ ██   ████    ██    ███████
+                                                                            v0.1.0
+model=openai-responses:gpt-5.2 session=cli-... compression=on
+Ready to build. What would you like to build?
+Enter send • Ctrl+J newline • @ files • / commands
+▌ >
+```
+
 ```bash
 agno-deep-agent "Analyze this project and suggest one small improvement"
 ```
@@ -81,6 +104,20 @@ Long options remain stable. The CLI also supports short/alias forms for convenie
 | `--quiet` / `-q` | Clean output for piping; hides members and buffers the answer. |
 | `--hide-members` / `--hide-agents` | Hide specialist member responses. |
 | `--debug` / `-d` | Enable Agno debug mode. |
+
+## Visual Identity
+
+The interactive CLI uses the same core Agno tokens as the documentation:
+
+| Token | Hex | Used For |
+| --- | --- | --- |
+| Agno primary | `#FF4017` | Logo, wordmark, prompt bar, command headings. |
+| Agno primary dark | `#C92D11` | Inline labels such as `model`, `session`, and `compression`. |
+| Agno accent | `#FF7A45` | Ready state, version, attachment/status highlights. |
+| Agno dark background | `#111113` | Recommended terminal background. |
+| Agno muted text | `#A1A1AA` | Hints and prompt separators. |
+
+Use `--no-color` or set `NO_COLOR=1` when plain output is preferred.
 
 ## Interactive Commands
 
