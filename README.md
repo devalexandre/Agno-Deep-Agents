@@ -27,8 +27,8 @@ MCP, and AgentOS is documented in [`docs/protocols.md`](docs/protocols.md).
 - **Agno context compression** for long tool-heavy sessions.
 - **Multimodal input** through Agno media classes for images, audio, video, and files.
 - **Installable CLI** with `agno-deep-agent`, plus aliases `agdeep` and `news`.
-- **Interactive CLI** with Agno-colored status, model switching, compression toggles,
-  and media attachments.
+- **Interactive CLI** with Agno logo/wordmark, Agno-colored status, model switching,
+  compression toggles, and media attachments.
 - **ACP stdio server** for editor and IDE integration.
 - **Protocol roadmap** for MCP tool loading and AgentOS.
 
@@ -120,6 +120,13 @@ Start an interactive Agno-colored session:
 
 ```bash
 agno-deep-agent
+```
+
+The interactive CLI opens with an `Agno Deep Agents` ASCII banner, an Agno logo
+mark, Agno orange tokens (`#FF4017`, `#C92D11`, `#FF7A45`), and a compact prompt:
+
+```text
+▌ >
 ```
 
 Pass a task directly:
