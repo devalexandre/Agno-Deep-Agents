@@ -31,6 +31,12 @@ agno-deep-agent --help
 
 ## Basic Usage
 
+Launch an interactive session:
+
+```bash
+agno-deep-agent
+```
+
 ```bash
 agno-deep-agent "Analyze this project and suggest one small improvement"
 ```
@@ -41,22 +47,58 @@ You can also pass the task through `stdin`:
 printf "Review the documentation and find gaps" | agno-deep-agent
 ```
 
+When stdin is piped and a prompt is also provided, the CLI combines them with
+the piped content first. This is useful for reviewing diffs:
+
+```bash
+git diff | agno-deep-agent --prompt "Review these changes"
+```
+
 ## Main Options
 
-| Option | Description |
+Long options remain stable. The CLI also supports short/alias forms for convenience:
+
+| Option (aliases) | Description |
 | --- | --- |
-| `--model` | Model string in `provider:model` format. |
-| `--workspace` | Workspace root for filesystem and shell tools. |
-| `--db-file` | SQLite path for sessions, memory, and learning. |
-| `--skills-dir` | Directory containing local skills. |
-| `--ollama-host` | Custom Ollama host. |
-| `--user-id` | Stable user identifier for memory. |
-| `--session-id` | Stable session identifier for continuing work. |
-| `--max-iterations` | Maximum team task-loop iterations. |
-| `--no-shell` | Disable shell execution. |
-| `--no-stream` | Print the answer only after completion. |
-| `--hide-members` | Hide specialist member responses. |
-| `--debug` | Enable Agno debug mode. |
+| `--model` / `-m` | Model string in `provider:model` format. |
+| `--workspace` / `-w` / `--workdir` | Workspace root for filesystem and shell tools. |
+| `--db-file` / `--db` | SQLite path for sessions, memory, and learning. |
+| `--skills-dir` / `--skills` | Directory containing local skills. |
+| `--ollama-host` / `--ollama-url` | Custom Ollama host. |
+| `--user-id` / `-u` / `--user` | Stable user identifier for memory. |
+| `--session-id` / `-s` / `--session` | Stable session identifier for continuing work. |
+| `--max-iterations` / `-n` / `--max-iter` / `--max-turns` | Maximum team task-loop iterations. |
+| `--no-shell` / `--no-exec` | Disable shell execution. |
+| `--shell-allow-list` / `-S` | Use a command allow-list, `recommended`, or `all`. |
+| `--no-compression` | Disable Agno tool-result compression. |
+| `--compression-model` | Use a cheaper/faster model for compression. |
+| `--compression-limit` | Compress after N uncompressed tool results. |
+| `--compression-token-limit` | Compress after a model-counted token threshold. |
+| `--image`, `--audio`, `--video`, `--file` | Attach multimodal inputs. |
+| `--startup-cmd` | Run a command before the first prompt; output is not injected. |
+| `--non-interactive` | Require args/stdin instead of opening the interactive CLI. |
+| `--no-stream` / `--quiet-stream` | Print the answer only after completion. |
+| `--quiet` / `-q` | Clean output for piping; hides members and buffers the answer. |
+| `--hide-members` / `--hide-agents` | Hide specialist member responses. |
+| `--debug` / `-d` | Enable Agno debug mode. |
+
+## Interactive Commands
+
+Inside the interactive CLI:
+
+| Command | Description |
+| --- | --- |
+| `/status` | Show model, workspace, session, compression, shell, and media state. |
+| `/model [provider:model]` | Show or switch the active model. |
+| `/compress on\|off\|status` | Toggle Agno tool-result compression. |
+| `/attach image <path-or-url>` | Attach an image to the next prompt. |
+| `/attach audio <path-or-url>` | Attach audio to the next prompt. |
+| `/attach video <path-or-url>` | Attach video to the next prompt. |
+| `/attach file <path-or-url>` | Attach a file/document to the next prompt. |
+| `/media` | Show pending attachments. |
+| `/clear` | Start a fresh session id. |
+| `!<command>` | Ask the agent to run an allowed shell command. |
+| `/quit` | Exit. |
 
 ## ACP Server
 
@@ -111,4 +153,19 @@ Use a specific workspace:
 ```bash
 agno-deep-agent --workspace /path/to/project \
   "Analyze the project and find implementation risks"
+```
+
+Attach media:
+
+```bash
+agno-deep-agent --image ./screenshot.png --file ./docs/spec.pdf \
+  "Compare the implementation with these inputs"
+```
+
+Use Agno compression with a dedicated compression model:
+
+```bash
+agno-deep-agent --compression-model openai-responses:gpt-4o-mini \
+  --compression-limit 2 \
+  "Do a deep codebase analysis"
 ```

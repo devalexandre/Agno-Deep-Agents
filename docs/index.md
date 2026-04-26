@@ -8,7 +8,9 @@ Agno Deep Agent is an opinionated harness for building deep agents with the
 Agno feel: easy to call, modular inside, and ready for long-running work.
 
 It combines `Team`, `Agent`, `Skills`, `SqliteDb`, memory, learning, and
-workspace tools behind a small interface:
+workspace tools behind a small interface. The CLI also adds Agno-native context
+compression and multimodal attachments for models that support images, audio,
+video, or files:
 
 ```python
 from agno_deep_agents import create_deep_agent
@@ -49,6 +51,9 @@ uses Agno primitives instead of introducing a separate runtime.
 - SQLite at `.deep-agent/agno.db` for sessions, memory, and learning.
 - Local skills in `skills/`.
 - Workspace-restricted `CodingTools`.
+- Agno context compression for long tool-heavy sessions.
+- Multimodal inputs through Agno `Image`, `Audio`, `Video`, and `File` classes.
+- Interactive Agno-colored CLI with `/model`, `/compress`, and `/attach`.
 - Support for OpenAI, local Ollama, and Ollama Cloud through model strings.
 - Agno-inspired documentation styling with dark mode and syntax highlighting.
 - ACP stdio server plus protocol direction for MCP and AgentOS.

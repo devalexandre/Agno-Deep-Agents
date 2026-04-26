@@ -21,6 +21,8 @@ Team(mode=TeamMode.tasks)
         +-- Skills(LocalSkills)
         +-- SqliteDb
         +-- CodingTools
+        +-- CompressionManager
+        +-- Media inputs
 ```
 
 ## Leader
@@ -30,6 +32,8 @@ The `Team` acts as the leader. It:
 - turns the user request into tasks;
 - delegates to specialist members;
 - stores context through the database;
+- compresses large tool results when configured;
+- forwards multimodal inputs to Agno-supported models;
 - applies global instructions;
 - exposes extra tools passed by the user.
 
@@ -50,6 +54,22 @@ All agents use the same `SqliteDb`. By default, the database lives at:
 ```
 
 This allows sessions, memories, and learnings to persist between runs.
+
+## Context Compression
+
+Agno Deep Agent enables Agno tool-result compression by default. Compression
+keeps long tool-heavy runs inside the model context by summarizing older tool
+outputs while preserving file paths, symbols, commands, errors, and decisions.
+
+Use `--no-compression` to disable it or `--compression-model` to choose a
+dedicated cheaper model.
+
+## Multimodal Input
+
+The CLI and SDK accept images, audio, video, and files. These are converted into
+Agno `Image`, `Audio`, `Video`, and `File` objects before the team run.
+
+Model support still depends on the provider and selected model.
 
 ## Workspace
 

@@ -24,7 +24,11 @@ MCP, and AgentOS is documented in [`docs/protocols.md`](docs/protocols.md).
 - **SQLite** at `.deep-agent/agno.db` for sessions, memory, and learning.
 - **Local skills** in `skills/`, loaded through Agno progressive discovery.
 - **Workspace-restricted `CodingTools`**.
-- **Installable CLI** with `agno-deep-agent` and the short alias `agdeep`.
+- **Agno context compression** for long tool-heavy sessions.
+- **Multimodal input** through Agno media classes for images, audio, video, and files.
+- **Installable CLI** with `agno-deep-agent`, plus aliases `agdeep` and `news`.
+- **Interactive CLI** with Agno-colored status, model switching, compression toggles,
+  and media attachments.
 - **ACP stdio server** for editor and IDE integration.
 - **Protocol roadmap** for MCP tool loading and AgentOS.
 
@@ -62,10 +66,11 @@ Then run:
 agno-deep-agent --help
 ```
 
-Short alias:
+Short aliases:
 
 ```bash
 agdeep --help
+news --help
 ```
 
 Dependency-only install, without registering the CLI command:
@@ -111,6 +116,12 @@ agno-deep-agent --model ollama-cloud:devstral-2 "Answer briefly"
 
 ## CLI Usage
 
+Start an interactive Agno-colored session:
+
+```bash
+agno-deep-agent
+```
+
 Pass a task directly:
 
 ```bash
@@ -121,6 +132,21 @@ Or pipe the task through stdin:
 
 ```bash
 printf "Create a CLI for running the agent with persistent memory" | agno-deep-agent
+```
+
+Attach multimodal context when the selected model supports it:
+
+```bash
+agno-deep-agent --image screenshot.png --file docs/spec.pdf \
+  "Review the UI and compare it with the spec"
+```
+
+Use compression controls for long sessions:
+
+```bash
+agno-deep-agent --compression-model openai-responses:gpt-4o-mini \
+  --compression-limit 2 \
+  "Analyze this repository and keep context compact"
 ```
 
 Disable shell execution when you want file tools only:
@@ -156,6 +182,7 @@ config = DeepAgentConfig(
     workspace=".",
     model="openai-responses:gpt-5.2",
     enable_shell=True,
+    compress_tool_results=True,
     max_iterations=8,
 )
 
@@ -164,6 +191,19 @@ run_deep_agent(
     config,
     user_id="dev@example.com",
     session_id="demo",
+)
+```
+
+Send multimodal inputs through the SDK:
+
+```python
+from agno_deep_agents import DeepAgentConfig, DeepAgentMedia, run_deep_agent
+
+
+run_deep_agent(
+    "Explain the screenshot and suggest one implementation fix.",
+    DeepAgentConfig(model="openai-responses:gpt-5.2"),
+    media=DeepAgentMedia(images=["screenshot.png"]),
 )
 ```
 
@@ -194,7 +234,10 @@ agent.print_response("what is the weather in sf?", stream=True)
 - **Filesystem**: `CodingTools` with `base_dir` and `restrict_to_base_dir=True`.
 - **Shell**: `CodingTools.run_shell` with command allowlist and timeout.
 - **Memory and learning**: `SqliteDb`, `enable_agentic_memory=True`, and `learning=True`.
-- **Context engineering**: history, session summaries, memory, and lazy-loaded skills.
+- **Context engineering**: history, session summaries, memory, lazy-loaded skills,
+  and Agno `compress_tool_results`.
+- **Multimodal**: Agno `Image`, `Audio`, `Video`, and `File` inputs from the CLI
+  and SDK.
 - **Model providers**: simple Agno-style model strings such as
   `openai-responses:gpt-5.2`, `openai:gpt-5.2`, `ollama:llama3.1:8b`, and
   `ollama-responses:gpt-oss:20b`. Use `ollama-cloud:<model>` for Ollama Cloud.

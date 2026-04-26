@@ -84,6 +84,41 @@ agno-deep-agent --model ollama:gemma4:e4b \
 The `ollama:` provider uses `http://localhost:11434` by default. This prevents
 an `OLLAMA_API_KEY` variable from accidentally sending local runs to cloud.
 
+## Interactive CLI
+
+Run without a prompt to open the Agno-colored interactive CLI:
+
+```bash
+agno-deep-agent --model ollama:gemma4:e4b
+```
+
+Useful commands inside the session:
+
+```text
+/status
+/model openai-responses:gpt-5.2
+/compress status
+/attach image screenshot.png
+/quit
+```
+
+## Multimodal And Compression
+
+Attach media when your model supports the modality:
+
+```bash
+agno-deep-agent --image screenshot.png --file docs/spec.pdf \
+  "Compare this UI with the spec"
+```
+
+Compression is enabled by default for tool-heavy sessions. You can dedicate a
+smaller model to compression:
+
+```bash
+agno-deep-agent --compression-model openai-responses:gpt-4o-mini \
+  "Analyze the codebase and keep context compact"
+```
+
 ## ACP For Editors
 
 Run the same agent harness as an ACP stdio server:
