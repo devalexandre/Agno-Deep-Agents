@@ -1,0 +1,4 @@
+interface:
+  display_name: "Go Programming"
+  short_description: "Idiomatic Go implementation, tests, and module work"
+  default_prompt: "Use the Go Programming skill to inspect the project, make a focused Go change, and run gofmt and relevant go test checks."

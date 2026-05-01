@@ -1,0 +1,4 @@
+interface:
+  display_name: "Python Programming"
+  short_description: "Python implementation, tests, packaging, and review"
+  default_prompt: "Use the Python Programming skill to inspect the project, make a focused Python change, and run the relevant checks."

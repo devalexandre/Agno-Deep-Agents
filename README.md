@@ -28,7 +28,7 @@ MCP, and AgentOS is documented in [`docs/protocols.md`](docs/protocols.md).
 - **Multimodal input** through Agno media classes for images, audio, video, and files.
 - **Installable CLI** with `agno-deep-agent`, plus aliases `agdeep` and `news`.
 - **Interactive CLI** with Agno logo/wordmark, Agno-colored status, model switching,
-  compression toggles, and media attachments.
+  provider examples, compression toggles, and media attachments.
 - **ACP stdio server** for editor and IDE integration.
 - **Protocol roadmap** for MCP tool loading and AgentOS.
 
@@ -87,11 +87,16 @@ If you use OpenAI models, set your API key:
 export OPENAI_API_KEY="your-key-here"
 ```
 
-Optionally set a default model:
+Optionally set the initial default model for workspaces without a saved model:
 
 ```bash
 export DEEP_AGENT_MODEL="openai-responses:gpt-5.2"
 ```
+
+Inside the interactive CLI, `/model <provider:model>` saves the selected model
+to `.deep-agent/config.json` for the current workspace. Future runs use that
+saved model until `/model` changes it again. Use `--model ...` for a one-off
+override.
 
 For local Ollama, start Ollama and pull a model. The `ollama:` provider uses
 `http://localhost:11434` by default, even when `OLLAMA_API_KEY` is set:
@@ -112,6 +117,14 @@ Use Ollama Cloud explicitly with:
 
 ```bash
 agno-deep-agent --model ollama-cloud:devstral-2 "Answer briefly"
+```
+
+Use any Agno-supported `provider:model` string when the provider SDK and API
+credentials are available:
+
+```bash
+export ANTHROPIC_API_KEY="your-key-here"
+agno-deep-agent --model anthropic:claude-sonnet-4-5 "Answer briefly"
 ```
 
 ## CLI Usage
@@ -246,8 +259,10 @@ agent.print_response("what is the weather in sf?", stream=True)
 - **Multimodal**: Agno `Image`, `Audio`, `Video`, and `File` inputs from the CLI
   and SDK.
 - **Model providers**: simple Agno-style model strings such as
-  `openai-responses:gpt-5.2`, `openai:gpt-5.2`, `ollama:llama3.1:8b`, and
-  `ollama-responses:gpt-oss:20b`. Use `ollama-cloud:<model>` for Ollama Cloud.
+  `openai-responses:gpt-5.2`, `anthropic:claude-sonnet-4-5`,
+  `google:gemini-3-flash-preview`, `groq:llama-3.3-70b-versatile`,
+  `ollama:llama3.1:8b`, and `ollama-responses:gpt-oss:20b`. Use
+  `/models` in the interactive CLI for common examples.
 - **Protocols**: ACP is available as a stdio server for editor/IDE integration,
   MCP is planned for external tool loading, and AgentOS is planned as an
   Agno-native API example.
@@ -269,6 +284,18 @@ agent.print_response("what is the weather in sf?", stream=True)
 |   +-- ollama_deep_agent.py
 +-- skills/
 |   +-- codebase-analysis/
+|   |   +-- SKILL.md
+|   +-- elixir-programming/
+|   |   +-- SKILL.md
+|   +-- go-programming/
+|   |   +-- SKILL.md
+|   +-- node-programming/
+|   |   +-- SKILL.md
+|   +-- python-programming/
+|   |   +-- SKILL.md
+|   +-- rust-programming/
+|   |   +-- SKILL.md
+|   +-- social-video-shorts/
 |   |   +-- SKILL.md
 |   +-- deep-agent-planning/
 |       +-- SKILL.md

@@ -83,7 +83,7 @@ Long options remain stable. The CLI also supports short/alias forms for convenie
 
 | Option (aliases) | Description |
 | --- | --- |
-| `--model` / `-m` | Model string in `provider:model` format. |
+| `--model` / `-m` | Agno model string in `provider:model` format; overrides the saved workspace model for this run. |
 | `--workspace` / `-w` / `--workdir` | Workspace root for filesystem and shell tools. |
 | `--db-file` / `--db` | SQLite path for sessions, memory, and learning. |
 | `--skills-dir` / `--skills` | Directory containing local skills. |
@@ -125,17 +125,19 @@ Inside the interactive CLI:
 
 | Command | Description |
 | --- | --- |
-| `/status` | Show model, workspace, session, compression, shell, and media state. |
-| `/model [provider:model]` | Show or switch the active model. |
-| `/compress on\|off\|status` | Toggle Agno tool-result compression. |
-| `/attach image <path-or-url>` | Attach an image to the next prompt. |
-| `/attach audio <path-or-url>` | Attach audio to the next prompt. |
-| `/attach video <path-or-url>` | Attach video to the next prompt. |
-| `/attach file <path-or-url>` | Attach a file/document to the next prompt. |
-| `/media` | Show pending attachments. |
-| `/clear` | Start a fresh session id. |
+| `/help`, `/h`, `/?` | Show command help. |
+| `/status`, `/s`, `/st` | Show model, workspace, session, compression, shell, and media state. |
+| `/model`, `/m [provider:model]` | Show or switch the active Agno model and save it for this workspace. |
+| `/models`, `/p`, `/providers` | List common Agno `provider:model` examples. |
+| `/compress`, `/c`, `/co`, `/comp on\|off\|status` | Toggle Agno tool-result compression. |
+| `/attach`, `/a image <path-or-url>` | Attach an image to the next prompt. |
+| `/attach`, `/a audio <path-or-url>` | Attach audio to the next prompt. |
+| `/attach`, `/a video <path-or-url>` | Attach video to the next prompt. |
+| `/attach`, `/a file <path-or-url>` | Attach a file/document to the next prompt. |
+| `/media`, `/ma`, `/attachments`, `/att` | Show pending attachments. |
+| `/clear`, `/cl`, `/new` | Start a fresh session id. |
 | `!<command>` | Ask the agent to run an allowed shell command. |
-| `/quit` | Exit. |
+| `/quit`, `/q`, `/exit` | Exit. |
 
 ## ACP Server
 
@@ -163,6 +165,21 @@ For per-editor ACP setup notes (Zed, VS Code-compatible extensions, JetBrains,
 and Neovim), see [ACP Editors](acp-editors.html).
 
 ## Examples
+
+Switch models in an interactive session:
+
+```text
+/models
+/m anthropic:claude-sonnet-4-5
+/m google:gemini-3-flash-preview
+/m groq:llama-3.3-70b-versatile
+```
+
+`/model ...` saves the selected model in `.deep-agent/config.json` under the
+active workspace. The next interactive or non-interactive run in that workspace
+uses the saved model until `/model ...` changes it again. Passing `--model ...`
+still overrides the saved value for that one process. `DEEP_AGENT_MODEL` is used
+when no workspace model has been saved.
 
 Run with local Ollama:
 

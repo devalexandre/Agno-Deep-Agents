@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import shutil
 import subprocess
@@ -11,7 +12,15 @@ from uuid import uuid4
 
 from agno_deep_agents import DeepAgentConfig, DeepAgentMedia, create_deep_agent, run_deep_agent
 from agno_deep_agents.acp_server import run_acp_server
+from agno_deep_agents.deep_agent import (
+    AGNO_MODEL_PROVIDER_INDEX_URL,
+    AGNO_MODEL_STRING_DOC_URL,
+    COMMON_MODEL_PROVIDER_EXAMPLES,
+    DEFAULT_DEEP_AGENT_MODEL,
+)
 
+
+WORKSPACE_CONFIG_FILE = "config.json"
 
 AGNO_COLORS = {
     "brand": "\033[1m\033[38;2;255;64;23m",
@@ -190,8 +199,13 @@ def _add_common_options(parser: argparse.ArgumentParser, *, include_session_id: 
     parser.add_argument(
         "-m",
         "--model",
-        default=os.getenv("DEEP_AGENT_MODEL", "openai-responses:gpt-5.2"),
-        help="Model spec, for example openai-responses:gpt-5.2 or ollama:devstral-2.",
+        default=None,
+        help=(
+            "Agno model spec in provider:model format, for example "
+            "openai-responses:gpt-5.2, anthropic:claude-sonnet-4-5, "
+            "google:gemini-3-flash-preview, groq:llama-3.3-70b-versatile, "
+            "or ollama:devstral-2. Overrides the saved workspace model for this run."
+        ),
     )
     parser.add_argument(
         "--ollama-host",
@@ -282,7 +296,8 @@ def main() -> int:
     args = parse_args()
     config = _build_config(args)
 
-    uses_openai = ":" not in args.model or args.model.startswith(("openai:", "openai-responses:", "responses:"))
+    model_spec = str(config.model)
+    uses_openai = ":" not in model_spec or model_spec.startswith(("openai:", "openai-responses:", "responses:"))
     if uses_openai and not os.getenv("OPENAI_API_KEY"):
         print(
             "Warning: OPENAI_API_KEY is not set; the run will fail when the model is called.",
@@ -326,11 +341,12 @@ def main() -> int:
 
 
 def _build_config(args: argparse.Namespace) -> DeepAgentConfig:
+    workspace = Path(args.workspace)
     config_kwargs: dict[str, object] = {
-        "workspace": Path(args.workspace),
+        "workspace": workspace,
         "db_file": Path(args.db_file) if args.db_file else None,
         "skills_dir": Path(args.skills_dir) if args.skills_dir else None,
-        "model": args.model,
+        "model": _resolve_model(args.model, workspace),
         "ollama_host": args.ollama_host,
         "enable_shell": not args.no_shell,
         "max_iterations": args.max_iterations,
@@ -362,6 +378,62 @@ def _build_config(args: argparse.Namespace) -> DeepAgentConfig:
         config_kwargs["compress_tool_results"] = True
 
     return DeepAgentConfig(**config_kwargs)
+
+
+def _resolve_model(cli_model: str | None, workspace: Path) -> str:
+    if cli_model and cli_model.strip():
+        return cli_model.strip()
+
+    saved_model = _load_saved_model(workspace)
+    if saved_model:
+        return saved_model
+
+    env_model = os.getenv("DEEP_AGENT_MODEL")
+    if env_model and env_model.strip():
+        return env_model.strip()
+
+    return DEFAULT_DEEP_AGENT_MODEL
+
+
+def _workspace_config_path(workspace: Path | str) -> Path:
+    return Path(workspace).expanduser().resolve() / ".deep-agent" / WORKSPACE_CONFIG_FILE
+
+
+def _load_saved_model(workspace: Path | str) -> str | None:
+    config_path = _workspace_config_path(workspace)
+    try:
+        data = json.loads(config_path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return None
+    except (OSError, json.JSONDecodeError):
+        return None
+
+    if not isinstance(data, dict):
+        return None
+    model = data.get("model")
+    if not isinstance(model, str) or not model.strip():
+        return None
+    return model.strip()
+
+
+def _save_model_preference(config: DeepAgentConfig) -> Path:
+    config_path = _workspace_config_path(config.resolved_workspace)
+    config_path.parent.mkdir(parents=True, exist_ok=True)
+
+    data: dict[str, object] = {}
+    try:
+        existing = json.loads(config_path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        existing = {}
+    except (OSError, json.JSONDecodeError):
+        existing = {}
+    if isinstance(existing, dict):
+        data.update(existing)
+
+    data["model"] = str(config.model)
+    data["version"] = 1
+    config_path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return config_path
 
 
 def _parse_shell_allow_list(value: str | None) -> tuple[tuple[str, ...], bool] | None:
@@ -449,7 +521,7 @@ def _run_interactive(
             print()
             return 0
         except KeyboardInterrupt:
-            print(_paint("\nUse /quit to exit, or keep typing a new prompt.", "warning", use_color))
+            print(_paint("\nUse /quit or /q to exit, or keep typing a new prompt.", "warning", use_color))
             continue
 
         prompt = prompt.strip()
@@ -506,29 +578,48 @@ def _handle_interactive_command(
 
     if name in {"/quit", "/exit", "/q"}:
         return None
-    if name in {"/help", "/?"}:
+    if name in {"/help", "/?", "/h"}:
         _print_interactive_help(use_color)
         return config, team, session_id, pending_media
-    if name == "/status":
+    if name in {"/models", "/providers", "/p"}:
+        _print_model_provider_examples(use_color)
+        return config, team, session_id, pending_media
+    if name in {"/status", "/s", "/st"}:
         _print_status(config, session_id, pending_media, use_color)
         return config, team, session_id, pending_media
-    if name == "/clear":
+    if name in {"/clear", "/cl", "/new"}:
         new_session_id = f"cli-{uuid4().hex[:8]}"
         print(_paint(f"New session: {new_session_id}", "accent", use_color))
         return config, create_deep_agent(config), new_session_id, DeepAgentMedia()
-    if name == "/model":
+    if name in {"/model", "/m"}:
         if not rest:
             print(_paint(f"Model: {config.model}", "accent", use_color))
+            print(_paint(f"Saved model file: {_workspace_config_path(config.resolved_workspace)}", "muted", use_color))
+            print(_paint("Use /models to list common Agno provider strings.", "muted", use_color))
             return config, team, session_id, pending_media
         new_config = replace(config, model=rest)
-        print(_paint(f"Switched model to {rest}", "accent", use_color))
-        return new_config, create_deep_agent(new_config), session_id, pending_media
-    if name == "/compress":
+        try:
+            new_team = create_deep_agent(new_config)
+        except RuntimeError as exc:
+            print(_paint(f"Could not switch model: {exc}", "error", use_color), file=sys.stderr)
+            return config, team, session_id, pending_media
+        except Exception as exc:  # pragma: no cover - keeps provider setup errors inside the REPL.
+            print(_paint(f"Could not switch model: {exc}", "error", use_color), file=sys.stderr)
+            return config, team, session_id, pending_media
+        try:
+            preference_path = _save_model_preference(new_config)
+        except OSError as exc:
+            print(_paint(f"Switched model to {rest}, but could not save it: {exc}", "warning", use_color))
+        else:
+            print(_paint(f"Switched model to {rest}", "accent", use_color))
+            print(_paint(f"Saved model preference to {preference_path}", "muted", use_color))
+        return new_config, new_team, session_id, pending_media
+    if name in {"/compress", "/c", "/co", "/comp"}:
         return _handle_compress_command(rest, config, team, session_id, pending_media, use_color)
-    if name == "/attach":
+    if name in {"/attach", "/a"}:
         updated_media = _handle_attach_command(rest, pending_media, use_color)
         return config, team, session_id, updated_media
-    if name in {"/media", "/attachments"}:
+    if name in {"/media", "/ma", "/attachments", "/att"}:
         print(_paint(_media_summary(pending_media), "accent", use_color))
         return config, team, session_id, pending_media
 
@@ -614,17 +705,30 @@ def _print_banner(
 
 def _print_interactive_help(use_color: bool) -> None:
     print(_paint("Commands", "primary", use_color))
-    print(_command_help("/status", "show model, workspace, compression, and pending media", use_color))
-    print(_command_help("/model [provider:model]", "show or switch model", use_color))
-    print(_command_help("/compress on|off|status", "toggle Agno tool-result compression", use_color))
-    print(_command_help("/attach image <path|url>", "attach image to the next prompt", use_color))
-    print(_command_help("/attach audio <path|url>", "attach audio to the next prompt", use_color))
-    print(_command_help("/attach video <path|url>", "attach video to the next prompt", use_color))
-    print(_command_help("/attach file <path|url>", "attach a document/file to the next prompt", use_color))
-    print(_command_help("/media", "show pending attachments", use_color))
-    print(_command_help("/clear", "start a fresh session id", use_color))
+    print(_command_help("/help | /h | /?", "show this help", use_color))
+    print(_command_help("/status | /s | /st", "show model, workspace, compression, and pending media", use_color))
+    print(_command_help("/model | /m [provider:model]", "show or switch the active Agno model", use_color))
+    print(_command_help("/models | /p | /providers", "list common Agno provider:model examples", use_color))
+    print(_command_help("/compress | /c | /co | /comp on|off|status", "toggle Agno tool-result compression", use_color))
+    print(_command_help("/attach | /a image <path|url>", "attach image to the next prompt", use_color))
+    print(_command_help("/attach | /a audio <path|url>", "attach audio to the next prompt", use_color))
+    print(_command_help("/attach | /a video <path|url>", "attach video to the next prompt", use_color))
+    print(_command_help("/attach | /a file <path|url>", "attach a document/file to the next prompt", use_color))
+    print(_command_help("/media | /ma | /att", "show pending attachments", use_color))
+    print(_command_help("/clear | /cl | /new", "start a fresh session id", use_color))
     print(_command_help("!<command>", "ask the agent to run an allowed shell command", use_color))
-    print(_command_help("/quit", "exit", use_color))
+    print(_command_help("/quit | /q | /exit", "exit", use_color))
+
+
+def _print_model_provider_examples(use_color: bool) -> None:
+    print(_paint("Model Providers", "primary", use_color))
+    print(_paint("Use /model <provider:model>. Common Agno examples:", "soft", use_color))
+    width = max(len(item.example) for item in COMMON_MODEL_PROVIDER_EXAMPLES) + 2
+    for item in COMMON_MODEL_PROVIDER_EXAMPLES:
+        example = item.example.ljust(width)
+        print("  " + _paint(example, "accent", use_color) + _paint(item.requirement, "soft", use_color))
+    print(_paint(f"Model string docs: {AGNO_MODEL_STRING_DOC_URL}", "muted", use_color))
+    print(_paint(f"All provider docs:  {AGNO_MODEL_PROVIDER_INDEX_URL}", "muted", use_color))
 
 
 def _print_status(
@@ -704,7 +808,7 @@ def _status_line(label: str, value: str, enabled: bool) -> str:
 
 
 def _command_help(command: str, description: str, enabled: bool) -> str:
-    return "  " + _paint(command.ljust(28), "accent", enabled) + _paint(description, "soft", enabled)
+    return "  " + _paint(command.ljust(48), "accent", enabled) + _paint(description, "soft", enabled)
 
 
 def _paint(text: str, style: str, enabled: bool) -> str:

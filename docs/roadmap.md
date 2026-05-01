@@ -12,7 +12,8 @@ workflows.
 
 - Installable CLI with `agno-deep-agent` and `agdeep`.
 - Python API with `create_deep_agent`.
-- OpenAI, local Ollama, Ollama Cloud, and Agno model strings.
+- Agno `provider:model` strings, including OpenAI, Anthropic, Google, Groq,
+  local Ollama, and Ollama Cloud.
 - SQLite sessions, memory, and learning.
 - Local skills.
 - GitHub Pages documentation.

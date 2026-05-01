@@ -36,7 +36,7 @@ uses Agno primitives instead of introducing a separate runtime.
 - [CLI](cli.html)
 - [ACP Editors](acp-editors.html)
 - [Python API](python-api.html)
-- [Models and Ollama](models.html)
+- [Models and Providers](models.html)
 - [Architecture](architecture.html)
 - [Protocols](protocols.html)
 - [Skills](skills.html)
@@ -53,8 +53,9 @@ uses Agno primitives instead of introducing a separate runtime.
 - Workspace-restricted `CodingTools`.
 - Agno context compression for long tool-heavy sessions.
 - Multimodal inputs through Agno `Image`, `Audio`, `Video`, and `File` classes.
-- Interactive Agno-colored CLI with `/model`, `/compress`, and `/attach`.
-- Support for OpenAI, local Ollama, and Ollama Cloud through model strings.
+- Interactive Agno-colored CLI with `/model`, `/models`, `/compress`, and `/attach`.
+- Support for Agno `provider:model` strings, including OpenAI, Anthropic,
+  Google, Groq, local Ollama, and Ollama Cloud.
 - Agno-inspired documentation styling with dark mode and syntax highlighting.
 - ACP stdio server plus protocol direction for MCP and AgentOS.
 

@@ -9,7 +9,7 @@ This guide gets Agno Deep Agent running locally.
 ## Requirements
 
 - Python 3.11 or newer.
-- A model available through OpenAI or Ollama.
+- A model available through any Agno-supported provider.
 - `pip` and permission to install dependencies.
 
 ## Install The CLI
@@ -84,6 +84,20 @@ agno-deep-agent --model ollama:gemma4:e4b \
 The `ollama:` provider uses `http://localhost:11434` by default. This prevents
 an `OLLAMA_API_KEY` variable from accidentally sending local runs to cloud.
 
+## Other Agno Providers
+
+Use the same Agno `provider:model` strings for Anthropic, Google, Groq, Mistral,
+DeepSeek, OpenRouter, Together, LiteLLM, and other supported providers:
+
+```bash
+export ANTHROPIC_API_KEY="your-key-here"
+agno-deep-agent --model anthropic:claude-sonnet-4-5 \
+  "Explain this project's architecture in 5 bullets"
+```
+
+In the interactive CLI, run `/models` to see common examples, then switch with
+`/model <provider:model>`.
+
 ## Interactive CLI
 
 Run without a prompt to open the Agno-colored interactive CLI:
@@ -106,11 +120,19 @@ Useful commands inside the session:
 
 ```text
 /status
+/models
 /model openai-responses:gpt-5.2
 /compress status
 /attach image screenshot.png
 /quit
 ```
+
+The same commands have short aliases, for example `/s`, `/p`, `/m`, `/c`, `/a`,
+`/ma`, `/cl`, `/h`, and `/q`.
+
+When you switch with `/model ...`, Agno Deep Agent saves the model in
+`.deep-agent/config.json` for the current workspace and reuses it on the next
+run. Use `--model ...` when you want a one-off override.
 
 ## Multimodal And Compression
 
@@ -156,4 +178,4 @@ and update `examples/ollama_deep_agent.py`.
 
 ## Next Step
 
-Read [Models and Ollama](models.html) to understand the supported providers.
+Read [Models and Providers](models.html) to understand the supported providers.

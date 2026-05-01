@@ -1,0 +1,4 @@
+interface:
+  display_name: "Elixir Programming"
+  short_description: "Elixir, Phoenix, OTP, Ecto, and ExUnit guidance"
+  default_prompt: "Use the Elixir Programming skill to inspect the Mix project, make a focused Elixir change, and run format and relevant tests."

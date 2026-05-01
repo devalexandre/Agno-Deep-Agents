@@ -1,0 +1,4 @@
+interface:
+  display_name: "Node Programming"
+  short_description: "Node.js and TypeScript implementation, tests, and builds"
+  default_prompt: "Use the Node Programming skill to inspect package scripts, make a focused JavaScript or TypeScript change, and run the relevant checks."

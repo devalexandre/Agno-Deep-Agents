@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rust Programming"
+  short_description: "Rust crate implementation, ownership review, and Cargo checks"
+  default_prompt: "Use the Rust Programming skill to inspect the crate, make a focused Rust change, and run cargo fmt plus relevant checks."

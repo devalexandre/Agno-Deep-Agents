@@ -12,6 +12,12 @@ Skills are loaded from the `skills/` directory through `LocalSkills`.
 | --- | --- |
 | `deep-agent-planning` | Planning, delegation, validation, and final delivery. |
 | `codebase-analysis` | Codebase reading, local pattern inference, and verification. |
+| `python-programming` | Python implementation, tests, packaging, and review. |
+| `go-programming` | Go implementation, modules, tests, and concurrency review. |
+| `node-programming` | Node.js, JavaScript, TypeScript, package scripts, and builds. |
+| `elixir-programming` | Elixir, Phoenix, OTP, Ecto, and ExUnit workflows. |
+| `rust-programming` | Rust crates, ownership, Cargo checks, and API review. |
+| `social-video-shorts` | Cut source videos into social-platform short clips. |
 
 ## Structure
 
@@ -19,7 +25,19 @@ Skills are loaded from the `skills/` directory through `LocalSkills`.
 skills/
 +-- codebase-analysis/
 |   +-- SKILL.md
++-- elixir-programming/
+|   +-- SKILL.md
++-- go-programming/
+|   +-- SKILL.md
 +-- deep-agent-planning/
+|   +-- SKILL.md
++-- node-programming/
+|   +-- SKILL.md
++-- python-programming/
+|   +-- SKILL.md
++-- rust-programming/
+|   +-- SKILL.md
++-- social-video-shorts/
     +-- SKILL.md
 ```
 

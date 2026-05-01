@@ -47,6 +47,62 @@ DEFAULT_ALLOWED_SHELL_COMMANDS = (
 )
 
 DEFAULT_LOCAL_OLLAMA_HOST = "http://localhost:11434"
+DEFAULT_DEEP_AGENT_MODEL = "openai-responses:gpt-5.2"
+AGNO_MODEL_STRING_DOC_URL = "https://docs.agno.com/models/model-as-string"
+AGNO_MODEL_PROVIDER_INDEX_URL = "https://docs.agno.com/models/providers/model-index"
+
+
+@dataclass(frozen=True, slots=True)
+class ModelProviderExample:
+    """A concise provider example shown by the CLI and documentation."""
+
+    provider: str
+    example: str
+    requirement: str
+
+
+COMMON_MODEL_PROVIDER_EXAMPLES = (
+    ModelProviderExample("openai-responses", "openai-responses:gpt-5.2", "OPENAI_API_KEY"),
+    ModelProviderExample("openai", "openai:gpt-4o", "OPENAI_API_KEY"),
+    ModelProviderExample("anthropic", "anthropic:claude-sonnet-4-5", "ANTHROPIC_API_KEY"),
+    ModelProviderExample("google", "google:gemini-3-flash-preview", "GOOGLE_API_KEY or Vertex AI"),
+    ModelProviderExample("groq", "groq:llama-3.3-70b-versatile", "GROQ_API_KEY"),
+    ModelProviderExample("mistral", "mistral:mistral-large-latest", "MISTRAL_API_KEY"),
+    ModelProviderExample("deepseek", "deepseek:deepseek-chat", "DEEPSEEK_API_KEY"),
+    ModelProviderExample("xai", "xai:grok-3", "XAI_API_KEY"),
+    ModelProviderExample("perplexity", "perplexity:sonar-pro", "PERPLEXITY_API_KEY"),
+    ModelProviderExample("cohere", "cohere:command-a-03-2025", "CO_API_KEY"),
+    ModelProviderExample("together", "together:meta-llama/Llama-3-70b-chat-hf", "TOGETHER_API_KEY"),
+    ModelProviderExample(
+        "fireworks",
+        "fireworks:accounts/fireworks/models/llama-v3p1-70b-instruct",
+        "FIREWORKS_API_KEY",
+    ),
+    ModelProviderExample("openrouter", "openrouter:anthropic/claude-3.5-sonnet", "OPENROUTER_API_KEY"),
+    ModelProviderExample("litellm", "litellm:gpt-4o", "provider-specific key"),
+    ModelProviderExample("azure-ai-foundry", "azure-ai-foundry:gpt-4o", "Azure AI Foundry credentials"),
+    ModelProviderExample("ollama", "ollama:gemma4:e4b", "local Ollama"),
+    ModelProviderExample("ollama-responses", "ollama-responses:gpt-oss:20b", "local Ollama Responses"),
+    ModelProviderExample("ollama-cloud", "ollama-cloud:devstral-2", "OLLAMA_API_KEY"),
+)
+
+MODEL_PROVIDER_ALIASES = {
+    "claude": "anthropic",
+    "gemini": "google",
+    "google-gemini": "google",
+}
+
+MODEL_PROVIDER_PACKAGE_HINTS = {
+    "anthropic": "anthropic",
+    "google": "google-genai",
+    "groq": "groq",
+    "mistral": "mistralai",
+    "cohere": "cohere",
+    "together": "together",
+    "fireworks": "fireworks-ai",
+    "litellm": "litellm",
+    "cerebras": "cerebras-cloud-sdk",
+}
 
 AGNO_COMPRESSION_PROMPT = """\
 Compress this tool result for a coding deep-agent session.
@@ -116,7 +172,7 @@ class DeepAgentConfig:
     db_file: Path | str | None = None
     skills_dir: Path | str | None = None
     model: str | Model = field(
-        default_factory=lambda: os.getenv("DEEP_AGENT_MODEL", "openai-responses:gpt-5.2")
+        default_factory=lambda: os.getenv("DEEP_AGENT_MODEL", DEFAULT_DEEP_AGENT_MODEL)
     )
     tools: Sequence[Any] = field(default_factory=tuple)
     instructions: str | Sequence[str] | None = None
@@ -406,11 +462,13 @@ def _build_model(config: DeepAgentConfig) -> Model:
     if ":" not in model_spec:
         return _build_openai_responses_model(model_spec)
 
-    provider, model_id = model_spec.split(":", 1)
-    provider = provider.strip().lower()
+    raw_provider, model_id = model_spec.split(":", 1)
+    provider = raw_provider.strip().lower()
+    provider = MODEL_PROVIDER_ALIASES.get(provider, provider)
     model_id = model_id.strip()
     if not provider or not model_id:
         raise RuntimeError("Model strings must use '<provider>:<model-id>', for example 'ollama:devstral-2'.")
+    resolved_model_spec = f"{provider}:{model_id}"
 
     try:
         if provider in {"openai-responses", "responses"}:
@@ -431,13 +489,31 @@ def _build_model(config: DeepAgentConfig) -> Model:
             from agno.models.ollama import OllamaResponses
 
             return OllamaResponses(id=model_id, host=config.ollama_host)
-        return get_model(model_spec)
+        return get_model(resolved_model_spec)
     except ImportError as exc:
-        package = "ollama" if provider.startswith("ollama") else provider
+        package = _provider_package_hint(provider)
+        install_hint = (
+            f"Run `pip install {package}`"
+            if package
+            else "Install the provider SDK listed in the Agno model provider docs"
+        )
         raise RuntimeError(
-            f"The '{provider}' model backend is not installed. Run `pip install {package}` "
-            "or `pip install -r requirements.txt` inside this project environment."
+            f"The '{provider}' model backend is not installed. {install_hint}, "
+            "or `pip install -r requirements.txt` for the default OpenAI/Ollama backends."
         ) from exc
+    except ValueError as exc:
+        raise RuntimeError(
+            f"Unsupported model provider '{provider}'. Use an Agno '<provider>:<model-id>' "
+            f"string; see {AGNO_MODEL_PROVIDER_INDEX_URL}."
+        ) from exc
+
+
+def _provider_package_hint(provider: str) -> str | None:
+    if provider.startswith("ollama"):
+        return "ollama"
+    if provider in {"openai", "openai-responses", "responses"}:
+        return "openai"
+    return MODEL_PROVIDER_PACKAGE_HINTS.get(provider)
 
 
 def _build_openai_responses_model(model_id: str) -> Model:
