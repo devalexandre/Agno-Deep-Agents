@@ -26,7 +26,7 @@ MCP, and AgentOS is documented in [`docs/protocols.md`](docs/protocols.md).
 - **Workspace-restricted `CodingTools`**.
 - **Agno context compression** for long tool-heavy sessions.
 - **Multimodal input** through Agno media classes for images, audio, video, and files.
-- **Installable CLI** with `agno-deep-agent`, plus aliases `agdeep` and `news`.
+- **Installable CLI** with `agno-deep-agent`, plus alias `agdeep`.
 - **Interactive CLI** with Agno logo/wordmark, Agno-colored status, model switching,
   provider examples, compression toggles, and media attachments.
 - **ACP stdio server** for editor and IDE integration.
@@ -70,7 +70,6 @@ Short aliases:
 
 ```bash
 agdeep --help
-news --help
 ```
 
 Dependency-only install, without registering the CLI command:

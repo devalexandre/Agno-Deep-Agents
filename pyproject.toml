@@ -26,8 +26,6 @@ Repository = "https://github.com/devalexandre/Agno-Deep-Agents"
 [project.scripts]
 agno-deep-agent = "agno_deep_agents.cli:main"
 agdeep = "agno_deep_agents.cli:main"
-# Alias for the "run" command (matches historical usage).
-news = "agno_deep_agents.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
