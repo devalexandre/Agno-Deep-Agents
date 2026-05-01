@@ -73,11 +73,6 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     if argv and argv[0] == "acp":
         return _parse_acp_args(argv[1:])
 
-    # Historical alias: `news ...` should behave like the default "run" command
-    # when invoked as `agno-deep-agent news ...`.
-    if argv and argv[0] == "news":
-        argv = argv[1:]
-
     return _parse_run_args(argv)
 
 
