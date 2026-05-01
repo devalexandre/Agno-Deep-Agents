@@ -777,7 +777,7 @@ def _print_large_agno_banner(use_color: bool) -> None:
         print(line)
     for line in DEEP_AGENTS_WORDMARK:
         print(_paint(line, "primary", use_color))
-    print(_paint(" " * 76 + "v0.1.0", "accent", use_color))
+    print(_paint(" " * 76 + "v0.1.1", "accent", use_color))
 
 
 def _compose_logo_wordmark(wordmark: tuple[str, ...], use_color: bool) -> list[str]:
